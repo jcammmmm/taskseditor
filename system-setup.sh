@@ -1,3 +1,10 @@
+cd monacoeditor
+npm install .
+cd example
+npm install .
+npm run build
+exit
+
 #this is a draft
 
 mkdir cgi-bin
