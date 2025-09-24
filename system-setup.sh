@@ -3,6 +3,11 @@ npm install .
 cd example
 npm install .
 npm run build
+cd ..
+cd ..
+ln -s monacoeditor/example/dist/index.html index.html
+ln -s monacoeditor/example/dist/index.js index.js
+ln -s monacoeditor/example/dist/index.css index.css
 exit
 
 #this is a draft
