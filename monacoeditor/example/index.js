@@ -26,7 +26,7 @@ var editor = monaco.editor.create(document.getElementById('container'), {
 function save() {
   var content = editor.getValue();
   console.log(content);
-  fetch('http://localhost/cgi-bin/xxx.py', {
+  fetch('http://localhost/script/save.py', {
     method: 'POST',
     body: content 
   });
