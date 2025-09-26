@@ -18,10 +18,7 @@ self.MonacoEnvironment = {
 	}
 };
 
-var editor = monaco.editor.create(document.getElementById('container'), {
-  value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
-	language: 'javascript'
-});
+var editor = monaco.editor.create(document.getElementById('container'), {});
 
 function save() {
   var content = editor.getValue();
@@ -30,10 +27,29 @@ function save() {
     method: 'POST',
     body: content 
   });
+}
 
+function load() {
+  fetch('http://localhost/taskseditor/tasks/main.tks', {
+    method: 'GET'
+  })
+
+
+  var pre = document.getElementsByTagName("pre");
+  pre[0].innerHTML = "OGROSITO!!!"
 }
 
 var button = document.createElement("button");
 button.innerHTML = "Save";
 button.onclick = save;
 document.body.appendChild(button);
+
+button = document.createElement("button");
+button.innerHTML = "Load";
+button.onclick = load;
+document.body.appendChild(button);
+
+var pre = document.createElement("pre");
+pre.innerHTML = "ogrosito";
+pre.onclick = load;
+document.body.appendChild(pre);
