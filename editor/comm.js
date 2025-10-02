@@ -1,7 +1,7 @@
 function save() {
   var content = editor.getValue();
   console.log(content);
-  fetch('http://localhost/script/save.py', {
+  fetch('http://192.168.0.61/script/save.py', {
     method: 'POST',
     body: content 
   });
@@ -14,7 +14,7 @@ function save() {
  */
 function load() {
   // Taken from https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#examples
-  fetch('http://localhost/taskseditor/tasks/main.tks')
+  fetch('http://192.168.0.61/taskseditor/tasks/main.tks')
     .then((response) => response.body)
     .then((rb) => {
       const reader = rb.getReader();
@@ -54,12 +54,53 @@ function load() {
 editor.setTheme("ace/theme/dracula");
 editor.session.setMode("ace/mode/text");
 
-var button = document.createElement("button");
-button.innerHTML = "Save";
-button.onclick = save;
-document.body.appendChild(button);
+var editorplaceholder = document.getElementById("editor");
 
-button = document.createElement("button");
-button.innerHTML = "Load";
-button.onclick = load;
-document.body.appendChild(button);
+var saveButton = document.createElement("button");
+saveButton.innerHTML = "Save";
+saveButton.onclick = save;
+document.body.insertBefore(saveButton, editorplaceholder)
+
+var loadButton = document.createElement("button");
+loadButton.innerHTML = "Load";
+loadButton.onclick = load;
+document.body.insertBefore(loadButton, editorplaceholder)
+
+var undoButton = document.createElement("button");
+undoButton.innerHTML = "Undo";
+undoButton.onclick = function() { editor.undo() };
+document.body.insertBefore(undoButton, editorplaceholder)
+
+var redoButton = document.createElement("button");
+redoButton.innerHTML = "Redo";
+redoButton.onclick = function() { editor.redo() };
+document.body.insertBefore(redoButton, editorplaceholder)
+
+var refs = {
+  saveButton: saveButton,
+  loadButton: loadButton,
+  undoButton: undoButton,
+  redoButton: redoButton,
+}
+
+function updateToolbar() {
+    refs.saveButton.disabled = editor.session.getUndoManager().isClean();
+    refs.undoButton.disabled = !editor.session.getUndoManager().hasUndo();
+    refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();
+}
+
+editor.on("input", updateToolbar);
+
+editor.session.setValue(localStorage.savedValue || "Welcome to ace Toolbar demo!")
+
+function save() {
+    localStorage.savedValue = editor.getValue(); 
+    editor.session.getUndoManager().markClean();
+    updateToolbar();
+}
+
+editor.commands.addCommand({
+    name: "save",
+    exec: save,
+    bindKey: { win: "ctrl-s", mac: "cmd-s" }
+});
