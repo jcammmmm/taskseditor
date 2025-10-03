@@ -1,3 +1,5 @@
+const HOST = "localhost"
+const PROTO = "http"
 /**
  * This function is executed when the user clicks on the 'Load' button.
  * It Downloads the main.tks file from the server, reads its contents
@@ -5,7 +7,7 @@
  */
 function load() {
   // Taken from https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#examples
-  fetch('http://192.168.0.61/taskseditor/tasks/main.tks')
+  fetch(`${PROTO}://${HOST}/taskseditor/tasks/main.tks`)
     .then((response) => response.body)
     .then((rb) => {
       const reader = rb.getReader();
@@ -47,11 +49,6 @@ editor.session.setMode("ace/mode/text");
 
 var editorplaceholder = document.getElementById("editor");
 
-var saveButton = document.createElement("button");
-saveButton.innerHTML = "Save";
-saveButton.onclick = save;
-document.body.insertBefore(saveButton, editorplaceholder)
-
 var loadButton = document.createElement("button");
 loadButton.innerHTML = "Load";
 loadButton.onclick = load;
@@ -68,22 +65,15 @@ redoButton.onclick = function() { editor.redo() };
 document.body.insertBefore(redoButton, editorplaceholder)
 
 var refs = {
-  saveButton: saveButton,
   loadButton: loadButton,
   undoButton: undoButton,
   redoButton: redoButton,
 }
 
 function updateToolbar() {
-  refs.saveButton.disabled = editor.session.getUndoManager().isClean();
   refs.undoButton.disabled = !editor.session.getUndoManager().hasUndo();
   refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();
 }
-
-editor.on("input", updateToolbar);
-
-
-editor.session.setValue(localStorage.savedValue || "Welcome to ace Toolbar demo!")
 
 function save() {
   localStorage.savedValue = editor.getValue();
@@ -91,19 +81,19 @@ function save() {
   updateToolbar();
 
   var content = editor.getValue();
-  console.log(content);
-  fetch('http://192.168.0.61/script/save.py', {
+  fetch(`${PROTO}://${HOST}/script/save.py`, {
     method: 'POST',
     body: content
   });
 }
 
-var text = editor.textInput.getElement();
-text.addEventListener("keyup", save);
-
+editor.on("input", updateToolbar);
+editor.textInput.getElement().addEventListener("keyup", save);
 
 editor.commands.addCommand({
     name: "save",
     exec: save,
     bindKey: { win: "ctrl-s", mac: "cmd-s" }
 });
+
+editor.session.setValue(localStorage.savedValue);
