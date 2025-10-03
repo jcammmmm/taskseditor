@@ -1,12 +1,3 @@
-function save() {
-  var content = editor.getValue();
-  console.log(content);
-  fetch('http://192.168.0.61/script/save.py', {
-    method: 'POST',
-    body: content 
-  });
-}
-
 /**
  * This function is executed when the user clicks on the 'Load' button.
  * It Downloads the main.tks file from the server, reads its contents
@@ -84,20 +75,32 @@ var refs = {
 }
 
 function updateToolbar() {
-    refs.saveButton.disabled = editor.session.getUndoManager().isClean();
-    refs.undoButton.disabled = !editor.session.getUndoManager().hasUndo();
-    refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();
+  refs.saveButton.disabled = editor.session.getUndoManager().isClean();
+  refs.undoButton.disabled = !editor.session.getUndoManager().hasUndo();
+  refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();
 }
 
 editor.on("input", updateToolbar);
 
+
 editor.session.setValue(localStorage.savedValue || "Welcome to ace Toolbar demo!")
 
 function save() {
-    localStorage.savedValue = editor.getValue(); 
-    editor.session.getUndoManager().markClean();
-    updateToolbar();
+  localStorage.savedValue = editor.getValue();
+  editor.session.getUndoManager().markClean();
+  updateToolbar();
+
+  var content = editor.getValue();
+  console.log(content);
+  fetch('http://192.168.0.61/script/save.py', {
+    method: 'POST',
+    body: content
+  });
 }
+
+var text = editor.textInput.getElement();
+text.addEventListener("keyup", save);
+
 
 editor.commands.addCommand({
     name: "save",
