@@ -96,4 +96,4 @@ editor.commands.addCommand({
     bindKey: { win: "ctrl-s", mac: "cmd-s" }
 });
 
-editor.session.setValue(localStorage.savedValue);
+load();
