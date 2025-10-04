@@ -1,10 +1,15 @@
 #!/usr/bin/python3
 import os
 import sys
+
+file = sys.stdout
+if os.getenv("APP_MODE", "dev") == "dev":
+  file = sys.stderr
+
 print("Content-type: text/html\n")
-print(os.getenv("QUERY_STRING", "???"), file=sys.stderr)
-print(os.getenv("SERVER_SOFTWARE", "???"), file=sys.stderr)
-print(os.getenv("REQUEST_METHOD", "???"), file=sys.stderr)
+print(os.getenv("QUERY_STRING", "???"), file=file)
+print(os.getenv("SERVER_SOFTWARE", "???"), file=file)
+print(os.getenv("REQUEST_METHOD", "???"), file=file)
 
 content = ''
 try:
