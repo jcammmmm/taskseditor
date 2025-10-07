@@ -14,5 +14,7 @@ ls -l
 ln -s editor/ace-builds/src-noconflict/
 
 # setting exec and write permissions
-chmod a+w tasks/main.tks
+chmod a+w tasks/tasks.tks
+chmod a+w tasks/plans.tks
+chmod a+w tasks/food.tks
 chmod 655 script/save.py

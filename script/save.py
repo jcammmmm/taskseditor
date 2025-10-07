@@ -7,15 +7,16 @@ if os.getenv("APP_MODE", "dev") == "dev":
   file = sys.stderr
 
 print("Content-type: text/html\n")
-print(os.getenv("QUERY_STRING", "???"), file=file)
+print(os.getenv("QUERY_STRING", "???"), file=sys.stderr)
 print(os.getenv("SERVER_SOFTWARE", "???"), file=file)
 print(os.getenv("REQUEST_METHOD", "???"), file=file)
 
 content = ''
+filename = os.getenv("QUERY_STRING", "???")
 try:
   while True:
     content = content + input() + "\n"
 except EOFError:
   print("EOF")
-with open("../tasks/main.tks", "w") as file:
+with open(f"../tasks/{filename}.tks", "w") as file:
     file.write(content)

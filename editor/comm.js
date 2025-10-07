@@ -1,13 +1,18 @@
 const HOST = "localhost"
 const PROTO = "http"
+const FILENAMES = ["tasks", "plans", "food"];
+var CURRENT_FILE = "tasks";
 /**
  * This function is executed when the user clicks on the 'Load' button.
  * It Downloads the main.tks file from the server, reads its contents
  * and then sets this value to the monaco editor.
  */
-function load() {
+// var load = function (filename) {
+function load(filename) {
   // Taken from https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#examples
-  fetch(`${PROTO}://${HOST}/taskseditor/tasks/main.tks`)
+  var url = `${PROTO}://${HOST}/taskseditor/tasks/${filename}.tks`
+  console.log(`loading file.. . "${url}"`);
+  fetch(url)
     .then((response) => response.body)
     .then((rb) => {
       const reader = rb.getReader();
@@ -20,14 +25,11 @@ function load() {
             reader.read().then(({ done, value }) => {
               // If there is no more data to read
               if (done) {
-                console.log("done", done);
                 controller.close();
                 return;
               }
               // Get the data and send it to the browser via the controller
               controller.enqueue(value);
-              // Check chunks by logging to the console
-              console.log(done, value);
               push();
             });
           }
@@ -50,12 +52,15 @@ function updateToolbar() {
 }
 
 function save() {
+  var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
+  console.log(`saving file.. . "${url}"`);
+
   localStorage.savedValue = editor.getValue();
   editor.session.getUndoManager().markClean();
   updateToolbar();
 
   var content = editor.getValue();
-  fetch(`${PROTO}://${HOST}/script/save.py`, {
+  fetch(url, {
     method: 'POST',
     body: content
   }).then(() => {
@@ -73,21 +78,15 @@ editor.setTheme("ace/theme/dracula");
 editor.session.setMode("ace/mode/text");
 
 var editorplaceholder = document.getElementById("editor");
-
-var loadButton = document.createElement("button");
-loadButton.innerHTML = "Tasks";
-loadButton.onclick = load;
-document.body.insertBefore(loadButton, editorplaceholder)
-
-var loadButton = document.createElement("button");
-loadButton.innerHTML = "Plans";
-loadButton.onclick = load;
-document.body.insertBefore(loadButton, editorplaceholder)
-
-var loadButton = document.createElement("button");
-loadButton.innerHTML = "Food";
-loadButton.onclick = load;
-document.body.insertBefore(loadButton, editorplaceholder)
+for (var filename of FILENAMES) {
+  var loadButton = document.createElement("button");
+  loadButton.innerHTML = filename;
+  loadButton.onclick = function (e) { 
+    load(e.target.innerHTML);
+    CURRENT_FILE = e.target.innerHTML; 
+  };
+  document.body.insertBefore(loadButton, editorplaceholder)
+}
 
 var undoButton = document.createElement("button");
 undoButton.innerHTML = "Undo";
@@ -111,8 +110,6 @@ var refs = {
   redoButton: redoButton,
 }
 
-
-
 editor.on("input", updateToolbar);
 editor.textInput.getElement().addEventListener("keyup", save);
 editor.textInput.getElement().addEventListener("keydown", setUnsave);
@@ -123,4 +120,4 @@ editor.commands.addCommand({
     bindKey: { win: "ctrl-s", mac: "cmd-s" }
 });
 
-load();
+load("tasks");
