@@ -77,38 +77,41 @@ function setUnsave() {
 editor.setTheme("ace/theme/dracula");
 editor.session.setMode("ace/mode/text");
 
+var refs = {};
+var buttonFileRefs = {};
 var editorplaceholder = document.getElementById("editor");
 for (var filename of FILENAMES) {
   var loadButton = document.createElement("button");
   loadButton.innerHTML = filename;
   loadButton.onclick = function (e) { 
     load(e.target.innerHTML);
-    CURRENT_FILE = e.target.innerHTML; 
+    CURRENT_FILE = e.target.innerHTML;
+    for (let btn in buttonFileRefs) {
+      buttonFileRefs[btn].disabled = false;
+    }
+    e.target.disabled = true;
   };
   document.body.insertBefore(loadButton, editorplaceholder)
+  buttonFileRefs[filename + "Button"] = loadButton
 }
 
 var undoButton = document.createElement("button");
 undoButton.innerHTML = "Undo";
 undoButton.onclick = function() { editor.undo() };
 document.body.insertBefore(undoButton, editorplaceholder)
+refs.undoButton = undoButton
 
 var redoButton = document.createElement("button");
 redoButton.innerHTML = "Redo";
 redoButton.onclick = function() { editor.redo() };
 document.body.insertBefore(redoButton, editorplaceholder)
+refs.redoButton = redoButton
 
 var saveStatus = document.createElement("pre");
 saveStatus.id = "saveStatus"
 saveStatus.innerHTML = "not saved";
 saveStatus.style = "color: red"
 document.body.insertBefore(saveStatus, editorplaceholder);
-
-var refs = {
-  loadButton: loadButton,
-  undoButton: undoButton,
-  redoButton: redoButton,
-}
 
 editor.on("input", updateToolbar);
 editor.textInput.getElement().addEventListener("keyup", save);
