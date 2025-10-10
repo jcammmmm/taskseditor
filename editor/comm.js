@@ -46,18 +46,12 @@ function load(filename) {
   });
 }
 
-function updateToolbar() {
-  refs.undoButton.disabled = !editor.session.getUndoManager().hasUndo();
-  refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();
-}
-
 function save() {
   var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
   console.log(`saving file.. . "${url}"`);
 
   localStorage.savedValue = editor.getValue();
   editor.session.getUndoManager().markClean();
-  updateToolbar();
 
   var content = editor.getValue();
   fetch(url, {
@@ -67,6 +61,11 @@ function save() {
     saveStatus.innerHTML = "saved.";
     saveStatus.style = "color: green"
   });
+}
+
+function backup() {
+  var url = `${PROTO}://${HOST}/script/backup.py?${CURRENT_FILE}`
+  console.log(`backing up file.. . "${url}"`);
 }
 
 function setUnsave() {
@@ -80,8 +79,9 @@ editor.session.setMode("ace/mode/text");
 var refs = {};
 var buttonFileRefs = {};
 var editorplaceholder = document.getElementById("editor");
+var loadButton;
 for (var filename of FILENAMES) {
-  var loadButton = document.createElement("button");
+  loadButton = document.createElement("button");
   loadButton.innerHTML = filename;
   loadButton.onclick = function (e) { 
     load(e.target.innerHTML);
@@ -95,17 +95,11 @@ for (var filename of FILENAMES) {
   buttonFileRefs[filename + "Button"] = loadButton
 }
 
-var undoButton = document.createElement("button");
-undoButton.innerHTML = "Undo";
-undoButton.onclick = function() { editor.undo() };
-document.body.insertBefore(undoButton, editorplaceholder)
-refs.undoButton = undoButton
-
-var redoButton = document.createElement("button");
-redoButton.innerHTML = "Redo";
-redoButton.onclick = function() { editor.redo() };
-document.body.insertBefore(redoButton, editorplaceholder)
-refs.redoButton = redoButton
+var backupButton = document.createElement("button");
+backupButton.innerHTML = "Backup";
+backupButton.onclick = function() { backup() };
+document.body.insertBefore(loadButton, editorplaceholder)
+refs.backupButton = backupButton
 
 var saveStatus = document.createElement("pre");
 saveStatus.id = "saveStatus"
@@ -113,7 +107,6 @@ saveStatus.innerHTML = "not saved";
 saveStatus.style = "color: red"
 document.body.insertBefore(saveStatus, editorplaceholder);
 
-editor.on("input", updateToolbar);
 editor.textInput.getElement().addEventListener("keyup", save);
 editor.textInput.getElement().addEventListener("keydown", setUnsave);
 
