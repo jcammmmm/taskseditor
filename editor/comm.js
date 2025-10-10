@@ -7,21 +7,19 @@ var CURRENT_FILE = "tasks";
  * It Downloads the main.tks file from the server, reads its contents
  * and then sets this value to the monaco editor.
  */
-// var load = function (filename) {
 function load(filename) {
   var url = `${PROTO}://${HOST}/script/load.py?${filename}`
-  fetch(url, {
-    method: 'GET'
-  }).then((response) => {
-    saveStatus.innerHTML = "loaded.";
-    saveStatus.style = "color: blue"
-    // editor.setValue(result);
-    console.log(response.body);
-  });
-
-  
   console.log(`loading file.. . "${url}"`);
-  fetch(url)
+  fetch(url, {
+    method: 'POST'
+  })
+  .then(response => { 
+    saveStatus.innerHTML = "loaded.";
+    saveStatus.style = "color: blue";
+    // editor.setValue(result);
+    return response.text();
+  })
+  .then(data => editor.setValue(data));
 }
 
 function save() {
