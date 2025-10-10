@@ -19,19 +19,6 @@ for fn in filenames:
   content = ""
   with open(f"../tasks/{fn}.tks", "r") as file:
     content = file.read()
-  # print(datetime.strptime(str(datetime.now()),'%d/%m/%y %H:%M:%S.%f'))
-  # print(str(datetime.now()))
   time = datetime.now().strftime("%y%m%d.%H%M%S")
   with open(f"../tasks/{fn}-{time}.tks", "w") as file:
     file.write(content)
-  
-
-# content = ''
-# filename = os.getenv("QUERY_STRING", "???")
-# try:
-#   while True:
-#     content = content + input() + "\n"
-# except EOFError:
-#   print("EOF")
-# with open(f"../tasks/{filename}.tks", "w") as file:
-#     file.write(content)

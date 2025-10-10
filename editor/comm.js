@@ -9,41 +9,19 @@ var CURRENT_FILE = "tasks";
  */
 // var load = function (filename) {
 function load(filename) {
-  // Taken from https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#examples
-  var url = `${PROTO}://${HOST}/taskseditor/tasks/${filename}.tks`
+  var url = `${PROTO}://${HOST}/script/load.py?${filename}`
+  fetch(url, {
+    method: 'GET'
+  }).then((response) => {
+    saveStatus.innerHTML = "loaded.";
+    saveStatus.style = "color: blue"
+    // editor.setValue(result);
+    console.log(response.body);
+  });
+
+  
   console.log(`loading file.. . "${url}"`);
   fetch(url)
-    .then((response) => response.body)
-    .then((rb) => {
-      const reader = rb.getReader();
-
-      return new ReadableStream({
-        start(controller) {
-          // The following function handles each data chunk
-          function push() {
-            // "done" is a Boolean and value a "Uint8Array"
-            reader.read().then(({ done, value }) => {
-              // If there is no more data to read
-              if (done) {
-                controller.close();
-                return;
-              }
-              // Get the data and send it to the browser via the controller
-              controller.enqueue(value);
-              push();
-            });
-          }
-          push();
-        },
-      });
-    })
-    .then((stream) =>
-    // Respond with our stream
-    new Response(stream, { headers: { "Content-Type": "text/html" } }).text(),
-  )
-  .then((result) => {
-    editor.setValue(result);
-  });
 }
 
 function save() {
@@ -76,12 +54,15 @@ function setUnsave() {
 editor.setTheme("ace/theme/dracula");
 editor.session.setMode("ace/mode/text");
 
+var editorplaceholder = document.getElementById("editor");
+
+var divButton = document.createElement("div");
+document.body.insertBefore(divButton, editorplaceholder);
+
 var refs = {};
 var buttonFileRefs = {};
-var editorplaceholder = document.getElementById("editor");
-var loadButton;
 for (var filename of FILENAMES) {
-  loadButton = document.createElement("button");
+  var loadButton = document.createElement("button");
   loadButton.innerHTML = filename;
   loadButton.onclick = function (e) { 
     load(e.target.innerHTML);
@@ -91,14 +72,14 @@ for (var filename of FILENAMES) {
     }
     e.target.disabled = true;
   };
-  document.body.insertBefore(loadButton, editorplaceholder)
+  divButton.appendChild(loadButton);
   buttonFileRefs[filename + "Button"] = loadButton
 }
 
 var backupButton = document.createElement("button");
 backupButton.innerHTML = "Backup";
 backupButton.onclick = function() { backup() };
-document.body.insertBefore(loadButton, editorplaceholder)
+divButton.appendChild(backupButton);
 refs.backupButton = backupButton
 
 var saveStatus = document.createElement("pre");

@@ -18,3 +18,5 @@ chmod a+w tasks/tasks.tks
 chmod a+w tasks/plans.tks
 chmod a+w tasks/food.tks
 chmod 655 script/save.py
+chmod 655 script/backup.py
+chmod 655 script/load.py
