@@ -13,13 +13,12 @@ function load(filename) {
   fetch(url, {
     method: 'POST'
   })
-  .then(response => { 
+  .then(response => response.text())
+  .then(data => {
+    editor.setValue(data)
     saveStatus.innerHTML = "loaded.";
     saveStatus.style = "color: blue";
-    // editor.setValue(result);
-    return response.text();
-  })
-  .then(data => editor.setValue(data));
+  });
 }
 
 function save() {
@@ -71,7 +70,7 @@ for (var filename of FILENAMES) {
     e.target.disabled = true;
   };
   divButton.appendChild(loadButton);
-  buttonFileRefs[filename + "Button"] = loadButton
+  buttonFileRefs[filename] = loadButton
 }
 
 var backupButton = document.createElement("button");
@@ -95,4 +94,6 @@ editor.commands.addCommand({
     bindKey: { win: "ctrl-s", mac: "cmd-s" }
 });
 
-load("tasks");
+// Click on the 'tasks' button. This will load the file and
+// configure the buttons
+buttonFileRefs["tasks"].click()
