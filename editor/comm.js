@@ -1,6 +1,7 @@
 const HOST = "localhost"
 const PROTO = "http"
 const FILENAMES = ["tasks", "plans", "food"];
+const BUTTON_REFS = {};
 var CURRENT_FILE = "tasks";
 /**
  * This function is executed when the user clicks on the 'Load' button.
@@ -25,9 +26,6 @@ function save() {
   var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
   console.log(`saving file.. . "${url}"`);
 
-  localStorage.savedValue = editor.getValue();
-  editor.session.getUndoManager().markClean();
-
   var content = editor.getValue();
   fetch(url, {
     method: 'POST',
@@ -49,52 +47,56 @@ function setUnsave() {
   saveStatus.style = "color: red"
 }
 
-editor.setTheme("ace/theme/dracula");
-editor.session.setMode("ace/mode/text");
-
-var editorplaceholder = document.getElementById("editor");
-
-var divButton = document.createElement("div");
-document.body.insertBefore(divButton, editorplaceholder);
-
-var refs = {};
-var buttonFileRefs = {};
-for (var filename of FILENAMES) {
-  var loadButton = document.createElement("button");
-  loadButton.innerHTML = filename;
-  loadButton.onclick = function (e) { 
-    load(e.target.innerHTML);
-    CURRENT_FILE = e.target.innerHTML;
-    for (let btn in buttonFileRefs) {
-      buttonFileRefs[btn].disabled = false;
-    }
-    e.target.disabled = true;
-  };
-  divButton.appendChild(loadButton);
-  buttonFileRefs[filename] = loadButton
+function renderButtons() {
+  // Editor DOM node
+  var editorplaceholder = document.getElementById("editor");
+  
+  var divButton = document.createElement("div");
+  document.body.insertBefore(divButton, editorplaceholder);
+  
+  for (var filename of FILENAMES) {
+    var loadButton = document.createElement("button");
+    loadButton.innerHTML = filename;
+    loadButton.onclick = function (e) { 
+      load(e.target.innerHTML);
+      CURRENT_FILE = e.target.innerHTML;
+      for (let btn in BUTTON_REFS) {
+        BUTTON_REFS[btn].disabled = false;
+      }
+      e.target.disabled = true;
+    };
+    divButton.appendChild(loadButton);
+    BUTTON_REFS[filename] = loadButton
+  }
+  
+  var backupButton = document.createElement("button");
+  backupButton.innerHTML = "Backup";
+  backupButton.onclick = function() { backup() };
+  divButton.appendChild(backupButton);
+  
+  var saveStatus = document.createElement("pre");
+  saveStatus.id = "saveStatus"
+  saveStatus.innerHTML = "not saved";
+  saveStatus.style = "color: red"
+  document.body.insertBefore(saveStatus, editorplaceholder);
 }
 
-var backupButton = document.createElement("button");
-backupButton.innerHTML = "Backup";
-backupButton.onclick = function() { backup() };
-divButton.appendChild(backupButton);
-refs.backupButton = backupButton
-
-var saveStatus = document.createElement("pre");
-saveStatus.id = "saveStatus"
-saveStatus.innerHTML = "not saved";
-saveStatus.style = "color: red"
-document.body.insertBefore(saveStatus, editorplaceholder);
-
-editor.textInput.getElement().addEventListener("keyup", save);
-editor.textInput.getElement().addEventListener("keydown", setUnsave);
-
-editor.commands.addCommand({
-    name: "save",
-    exec: save,
-    bindKey: { win: "ctrl-s", mac: "cmd-s" }
-});
+function configureEditor(editor) {
+  editor.setTheme("ace/theme/dracula");
+  editor.session.setMode("ace/mode/text");
+  
+  editor.textInput.getElement().addEventListener("keyup", save);
+  editor.textInput.getElement().addEventListener("keydown", setUnsave);
+  
+  editor.commands.addCommand({
+      name: "save",
+      exec: save,
+      bindKey: { win: "ctrl-s", mac: "cmd-s" }
+  });
+}
 
 // Click on the 'tasks' button. This will load the file and
 // configure the buttons
-buttonFileRefs["tasks"].click()
+renderButtons();
+configureEditor(editor);
+BUTTON_REFS["tasks"].click();
