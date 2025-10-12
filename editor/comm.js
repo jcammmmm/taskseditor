@@ -39,8 +39,9 @@ function save() {
 }
 
 function backup() {
-  var url = `${PROTO}://${HOST}/script/backup.py?${CURRENT_FILE}`
-  console.log(`backing up file.. . "${url}"`);
+  var url = `${PROTO}://${HOST}/script/backup.py`
+  fetch(url);
+  console.log(`backing up files.. . "${url}"`);
 }
 
 function setUnsave() {
