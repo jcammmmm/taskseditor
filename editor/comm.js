@@ -30,9 +30,13 @@ function save() {
   fetch(url, {
     method: 'POST',
     body: content
-  }).then(() => {
-    saveStatus.innerHTML = "saved.";
-    saveStatus.style = "color: green"
+  })
+  .then(response => response.text())
+  .then(data => {
+    serverMessage.innerHTML = data;
+    serverMessage.style = "color: yellow"
+  })
+  .then(() => {
   });
 }
 
@@ -79,6 +83,12 @@ function renderButtons() {
   saveStatus.innerHTML = "not saved";
   saveStatus.style = "color: red"
   document.body.insertBefore(saveStatus, editorplaceholder);
+
+  var serverMessage = document.createElement("pre");
+  serverMessage.id = "serverMessage"
+  serverMessage.innerHTML = "not saved";
+  serverMessage.style = "color: red"
+  document.body.insertBefore(serverMessage, editorplaceholder);
 }
 
 function configureEditor(editor) {
