@@ -22,14 +22,19 @@
 </head>
 <body>
 
-<pre id="editor"></pre>
+  <!-- MONACO -->
+  <div id="container" style="width: 800px; height: 600px; border: 1px solid #ccc"></div>
+  <script src="editor/monaco/dist/app.bundle.js"></script>
+  
+  <!-- ACE -->
+  <pre id="editor"></pre>
+  <script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var editor = ace.edit("editor");
+  </script>
 
-<script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-<script>
-  var editor = ace.edit("editor");
-</script>
-<script src="editor/comm.js"></script>
+  <!-- BUTTONS -->
+  <script src="editor/comm.js"></script>
 
 </body>
 </html>
-
