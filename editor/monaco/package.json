@@ -1,0 +1,23 @@
+{
+	"name": "monaco-editor",
+	"version": "0.0.1",
+	"private": true,
+	"description": "Samples for using the Monaco Editor",
+	"main": "index.js",
+	"scripts": {
+		"simpleserver": "yaserver --root ./ --port 8888",
+    "build": "npx webpack",
+    "buildpro": "node ../node_modules/webpack/bin/webpack.js --progress"
+	},
+	"author": "Microsoft Corporation",
+	"license": "MIT",
+	"devDependencies": {
+    "css-loader": "^5.2.7",
+    "file-loader": "^6.2.0",
+    "monaco-editor": "^0.53.0-dev-20250905",
+		"style-loader": "^3.3.1",
+		"webpack": "^5.101.3",
+		"webpack-cli": "^4.9.2",
+		"yaserver": "^0.4.0"
+	}
+}
