@@ -3,7 +3,7 @@ import sys
 mode = sys.argv[1]
 
 monaco = """<!-- MONACO -->
-  <div id="container" style="width: 800px; height: 600px; border: 1px solid #ccc"></div>
+  <div id="editor" style="width: 800px; height: 600px; border: 1px solid #ccc"></div>
   <script src="editor/monaco/dist/app.bundle.js"></script>
 """
 

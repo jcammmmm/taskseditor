@@ -91,7 +91,7 @@ function renderButtons() {
   document.body.insertBefore(serverMessage, editorplaceholder);
 }
 
-function configureEditor(editor) {
+function configureAceEditor(editor) {
   editor.setTheme("ace/theme/dracula");
   editor.session.setMode("ace/mode/text");
   
@@ -99,14 +99,18 @@ function configureEditor(editor) {
   editor.textInput.getElement().addEventListener("keydown", setUnsave);
   
   editor.commands.addCommand({
-      name: "save",
-      exec: save,
-      bindKey: { win: "ctrl-s", mac: "cmd-s" }
+    name: "save",
+    exec: save,
+    bindKey: { win: "ctrl-s", mac: "cmd-s" }
   });
 }
 
+function configureMonacoEditor(editor) {
+
+}
 // Click on the 'tasks' button. This will load the file and
 // configure the buttons
+
 renderButtons();
-configureEditor(editor);
+configureMonacoEditor(editor);
 BUTTON_REFS["tasks"].click();

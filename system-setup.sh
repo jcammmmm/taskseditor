@@ -1,5 +1,14 @@
+# TODO
+# check if the following software is installed to continue:
+# - node
+# - python
+# - git
+
 
 echo Setting up folder for $1 editor
+
+git restore index.html
+
 case $1 in
 
 "ace")
@@ -8,26 +17,26 @@ case $1 in
   rm -f comm.js
 
   # clone ace build's repository
-  cd editor
+  pushd editor
   rm -rf ace-builds
   git clone https://github.com/ajaxorg/ace-builds/ --depth 1
 
   # make links to shorten urls
-  cd ..
+  popd
   ls -l
   ln -s editor/ace-builds/src-noconflict/
 ;;
 
 "monaco")
-  cd editor/monaco
+  pushd editor/monaco
   npm install .
   npx webpack
-  cd dist
+  popd
 ;;
 
 *)
-echo "Please select and option: 'monaco' or 'ace'"
-exit
+  echo "Please select and option: 'monaco' or 'ace'"
+  exit
 
 esac
 
