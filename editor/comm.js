@@ -22,6 +22,9 @@ function load(filename) {
   });
 }
 
+/**
+ * @deprecated in favor of new update logic. 
+ */
 function save() {
   var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
   console.log(`saving file.. . "${url}"`);
@@ -36,8 +39,46 @@ function save() {
     serverMessage.innerHTML = data;
     serverMessage.style = "color: yellow"
   })
-  .then(() => {
-  });
+}
+
+/**
+ * 
+ */
+let lastEdit = null;
+let i = 0;
+let firstLoad = true;
+
+function sendFileUpdate(event) {
+  if (firstLoad) {
+    firstLoad = false;
+    return;
+  }
+  
+  var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
+  let changes = [];
+  // Several changes occur when you type '"' and automatically the
+  // editor adds the matching quote.
+  for (c of event.changes) {
+    // https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html#erased-structural-types
+    changes.push({
+      range: c.range,
+      text: c.text
+    })
+  }
+  
+  contentUpdates = JSON.stringify(changes, null, "\t");
+  console.log(contentUpdates);
+  console.log(`sending content updates to: "${url}"`);
+
+  fetch(url, {
+    method: 'POST',
+    body: contentUpdates
+  })
+  .then(response => response.text())
+  .then(data => {
+    serverMessage.innerHTML = data;
+    serverMessage.style = "color: yellow"
+  })
 }
 
 function backup() {
@@ -91,23 +132,11 @@ function renderButtons() {
   document.body.insertBefore(serverMessage, editorplaceholder);
 }
 
-function configureAceEditor(editor) {
-  editor.setTheme("ace/theme/dracula");
-  editor.session.setMode("ace/mode/text");
-  
-  editor.textInput.getElement().addEventListener("keyup", save);
-  editor.textInput.getElement().addEventListener("keydown", setUnsave);
-  
-  editor.commands.addCommand({
-    name: "save",
-    exec: save,
-    bindKey: { win: "ctrl-s", mac: "cmd-s" }
-  });
-}
 
 function configureMonacoEditor(editor) {
-
+  editor.getModel().onDidChangeContent(sendFileUpdate);
 }
+
 // Click on the 'tasks' button. This will load the file and
 // configure the buttons
 
