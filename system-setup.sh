@@ -1,17 +1,44 @@
-# TODO
-# check if the following software is installed to continue:
-# - node
-# - python
-# - git
+PRIVATE_KEY_NAME="digitalocean-dropletbasic"
+HOST_ADDR="164.92.98.105"
+HOST_USER="root"
+APPNAME=taskseditor
+RELEASE_ARTIFACT_NAME=$APPNAME-release.zip
 
 
-echo Setting up folder for $1 editor
 
-git restore index.html
+clean() {
+  git restore index.html
+}
 
-case $1 in
+check_installed() {
+  echo "Verify environment requirements.. ."
+  for i in $@
+  do
+    which $i > '/dev/null'
+    if [[ $? -eq 1 ]]; then
+      echo "You need to install '$i' to proceed."
+      exit
+    fi
+  done
+  echo "Verify environemnt requirements OK"
+}
 
-"ace")
+build_system() {
+  echo "Setting up folder..."
+  check_installed node python git
+
+  pushd editor/monaco
+  npm install .
+  npx webpack
+  popd
+
+  ln -s editor/monaco/dist/ts.worker.bundle.js
+  ln -s editor/monaco/dist/editor.worker.bundle.js
+  echo "Setting up folder OK"
+}
+
+build_system_ace() {
+  exit
   # remove link if any
   rm -rf src*
   rm -f comm.js
@@ -25,30 +52,56 @@ case $1 in
   popd
   ls -l
   ln -s editor/ace-builds/src-noconflict/
+
+  python generate-index.py $1
+}
+
+grant_permissions() {
+  # setting exec and write permissions
+  chmod a+w tasks/tasks.tks    # apache server user has write access
+  chmod a+w tasks/plans.tks    # apache server user has write access
+  chmod a+w tasks/food.tks     # apache server user has write access
+  chmod 655 script/save.py     # apache server user can execute
+  chmod 655 script/backup.py   # apache server user can execute
+  chmod 655 script/load.py     # apache server user can execute
+}
+
+case $1 in
+
+"deploy")
+  SERVER_APP_LOC=/var/www/html
+  check_installed ssh
+  echo "Compressing the system.. ."
+  # compress ignoring ignored by git files
+  zip -r $RELEASE_ARTIFACT_NAME . -x@.gitignore --symlinks
+  # add the dist folder
+  zip -r $RELEASE_ARTIFACT_NAME . -i "editor/monaco/dist/*"
+  echo "OK"
+  echo
+
+  echo "Uploading the release artifact to the cloud instance.. ."
+  scp -r -i "~/.ssh/$PRIVATE_KEY_NAME" $RELEASE_ARTIFACT_NAME "$HOST_USER@$HOST_ADDR:$SERVER_APP_LOC"
+  echo "OK"
+  echo
+
+  echo "Unpacking artifactict in the cloud instance.. ."
+  ssh -i "~/.ssh/$PRIVATE_KEY_NAME" "$HOST_USER@$HOST_ADDR" unzip -o $SERVER_APP_LOC/$RELEASE_ARTIFACT_NAME -d $SERVER_APP_LOC/taskseditor
+  echo "OK"
+  echo
 ;;
 
-"monaco")
-  pushd editor/monaco
-  npm install .
-  npx webpack
-  popd
-
-  ln -s editor/monaco/dist/ts.worker.bundle.js
-  ln -s editor/monaco/dist/editor.worker.bundle.js
-  ;;
+"generate")
+  build_system  
+;;
 
 *)
-  echo "Please select and option: 'monaco' or 'ace'"
+  echo "Please select and option: 'generate' or 'deploy'"
   exit
 
 esac
 
-python generate-index.py $1
 
-# setting exec and write permissions
-chmod a+w tasks/tasks.tks    # apache server user has write access
-chmod a+w tasks/plans.tks    # apache server user has write access
-chmod a+w tasks/food.tks     # apache server user has write access
-chmod 655 script/save.py     # apache server user can execute
-chmod 655 script/backup.py   # apache server user can execute
-chmod 655 script/load.py     # apache server user can execute
+
+
+
+

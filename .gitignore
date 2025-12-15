@@ -9,3 +9,7 @@ src-noconflict
 
 # misc.
 tasks/*
+
+# we use .gitignore to exclude files from the deploy zip
+.git/**
+**/ace-builds/**
