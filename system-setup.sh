@@ -34,6 +34,9 @@ build_system() {
 
   ln -s editor/monaco/dist/ts.worker.bundle.js
   ln -s editor/monaco/dist/editor.worker.bundle.js
+  
+  python generate-index.py monaco
+  
   echo "Setting up folder OK"
 }
 
@@ -53,7 +56,6 @@ build_system_ace() {
   ls -l
   ln -s editor/ace-builds/src-noconflict/
 
-  python generate-index.py $1
 }
 
 grant_permissions() {
@@ -91,7 +93,8 @@ case $1 in
 ;;
 
 "generate")
-  build_system  
+  build_system
+  grant_permissions
 ;;
 
 *)

@@ -6,7 +6,7 @@ from json import loads as decode_json, JSONDecodeError
 
 
 SYS_OUTPUT = sys.stdout
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
 if __name__ == '__main__':
   SYS_OUTPUT = sys.stderr #  the easiest to log something with apache.
 else:
@@ -76,32 +76,55 @@ def _get_insertion_points(update, oneline_string_content):
   # insert update
   row_num = 1
   col_num = 1
-  i = 1
+  i = 0
   ini = -1
   end = -1
   resolve_ini = True
+  resolve_end = True
+
+  """
+  i r c A B a b
+  1 1 1 1 3 - - 
+  2 2
+  """
+
   for c in oneline_string_content:
-    if c == '\n':
-      row_num += 1
-      col_num = 1
-    # logger.debug(f"{i} {ini} {end}")
-    # logger.debug(f"{resolve_ini} {row_num} == {end_row} | {col_num} == {end_col}")
+    logger.debug("------------------------------------------------")
+    logger.debug(f"{i} {ini} {end}")
+    logger.debug(f"> {resolve_ini} {row_num} | {col_num} ")
+    logger.debug(f"s {resolve_ini} {start_row} | {start_col} ")
+    logger.debug(f"e {resolve_ini} {end_row} | {end_col} ")
     if resolve_ini and row_num == start_row and col_num == start_col:
       ini = i
       resolve_ini = False
       if start_row == end_row and start_col == end_col: # no selection
         end = ini
-        break
     elif not resolve_ini and row_num == end_row and col_num == end_col:
       end = i
-      break
-
-    col_num += 1
+    
+    if c == '\n':
+      row_num += 1
+      col_num = 1
+    else:
+      col_num += 1
     i += 1
+
+  if end_col == col_num: # end_col == max_col + 1
+    logger.debug("Update location is after the last character.")
+    if not resolve_ini:
+      end = i
+    else:
+      ini = end = i
+  elif end_row == row_num + 1:
+    logger.debug("Update location is a newline after the last character")
+    ini = end = i 
+    # we need to add the new line character introduced there
+    update["text"] = '\n' + update.get('text') 
+
+  logger.debug(f"{ini} {end}")
 
   if end < 0 or ini < 0: 
     mssge = "The range provided in the update action does not match the current text!"
-    print(mssge)
     raise Exception(mssge)
   logger.debug(f"{start_row} {start_col} {end_row} {end_col}")
 
@@ -115,10 +138,10 @@ def apply_one_update(update, curr_content):
 
   Return: the updated content.
   """
-  new_text = update.get('text')
   ini, end = _get_insertion_points(update, curr_content)
+  new_text = update.get('text')
+  print(new_text.encode("unicode_escape"))
 
-  logger.debug(f"{ini} {end}")
   return curr_content[:ini] + new_text + curr_content[end:]
 
 
@@ -138,4 +161,5 @@ def apply_updates():
 try:
   apply_updates()
 except Exception as e:
-  print("The server was unable to store your latest changes. Please reload the editor.")
+  logger.error(e)
+  print(e)
