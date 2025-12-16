@@ -35,8 +35,6 @@ build_system() {
   ln -s editor/monaco/dist/ts.worker.bundle.js
   ln -s editor/monaco/dist/editor.worker.bundle.js
   
-  python generate-index.py monaco
-  
   echo "Setting up folder OK"
 }
 
@@ -73,11 +71,14 @@ case $1 in
 "deploy")
   SERVER_APP_LOC=/var/www/html
   check_installed ssh
+
+  sed -i -e "s/localhost/$HOST_ADDR/g" editor/client.js
+
   echo "Compressing the system.. ."
   # compress ignoring ignored by git files
   zip -r $RELEASE_ARTIFACT_NAME . -x@.gitignore --symlinks
   # add the dist folder
-  zip -r $RELEASE_ARTIFACT_NAME . -i "editor/monaco/dist/*"
+  zip -r $RELEASE_ARTIFACT_NAME . -i "editor/monaco/dist/*" -i "tasks/*"
   echo "OK"
   echo
 
@@ -90,6 +91,8 @@ case $1 in
   ssh -i "~/.ssh/$PRIVATE_KEY_NAME" "$HOST_USER@$HOST_ADDR" unzip -o $SERVER_APP_LOC/$RELEASE_ARTIFACT_NAME -d $SERVER_APP_LOC/taskseditor
   echo "OK"
   echo
+
+  echo "Deploy Completed."
 ;;
 
 "generate")

@@ -16,9 +16,8 @@ function load(filename) {
   })
   .then(response => response.text())
   .then(data => {
-    editor.setValue(data)
-    saveStatus.innerHTML = "loaded.";
-    saveStatus.style = "color: blue";
+    editor.setValue(data);
+    console.log("loaded.");
   });
 }
 
@@ -36,8 +35,7 @@ function save() {
   })
   .then(response => response.text())
   .then(data => {
-    serverMessage.innerHTML = data;
-    serverMessage.style = "color: yellow"
+    console.log(data);
   })
 }
 
@@ -76,8 +74,7 @@ function sendFileUpdate(event) {
   })
   .then(response => response.text())
   .then(data => {
-    serverMessage.innerHTML = data;
-    serverMessage.style = "color: yellow"
+    console.log(data);
   })
 }
 
@@ -101,35 +98,38 @@ function renderButtons() {
   
   for (var filename of FILENAMES) {
     var loadButton = document.createElement("button");
+    loadButton.className = "tablink"
     loadButton.innerHTML = filename;
     loadButton.onclick = function (e) { 
       load(e.target.innerHTML);
       CURRENT_FILE = e.target.innerHTML;
       for (let btn in BUTTON_REFS) {
         BUTTON_REFS[btn].disabled = false;
+        BUTTON_REFS[btn].style = "border-bottom: none; color: #858585;"
       }
       e.target.disabled = true;
+      e.target.style = "border-bottom: solid white; color: white;"
     };
     divButton.appendChild(loadButton);
     BUTTON_REFS[filename] = loadButton
   }
   
-  var backupButton = document.createElement("button");
-  backupButton.innerHTML = "Backup";
-  backupButton.onclick = function() { backup() };
-  divButton.appendChild(backupButton);
+  // var backupButton = document.createElement("button");
+  // backupButton.innerHTML = "Backup";
+  // backupButton.onclick = function() { backup() };
+  // divButton.appendChild(backupButton);
   
-  var saveStatus = document.createElement("pre");
-  saveStatus.id = "saveStatus"
-  saveStatus.innerHTML = "not saved";
-  saveStatus.style = "color: red"
-  document.body.insertBefore(saveStatus, editorplaceholder);
+  // var saveStatus = document.createElement("pre");
+  // saveStatus.id = "saveStatus"
+  // saveStatus.innerHTML = "not saved";
+  // saveStatus.style = "color: red"
+  // document.body.insertBefore(saveStatus, editorplaceholder);
 
-  var serverMessage = document.createElement("pre");
-  serverMessage.id = "serverMessage"
-  serverMessage.innerHTML = "not saved";
-  serverMessage.style = "color: red"
-  document.body.insertBefore(serverMessage, editorplaceholder);
+  // var serverMessage = document.createElement("pre");
+  // serverMessage.id = "serverMessage"
+  // serverMessage.innerHTML = "not saved";
+  // serverMessage.style = "color: red"
+  // document.body.insertBefore(serverMessage, editorplaceholder);
 }
 
 

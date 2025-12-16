@@ -19,7 +19,6 @@ self.MonacoEnvironment = {
 };
 
 window.editor = monaco.editor.create(document.getElementById('editor'), {
-	value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
-	language: 'javascript',
+	value: "Loading .. .",
   theme: "vs-dark",
 });
