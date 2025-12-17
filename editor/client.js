@@ -89,12 +89,8 @@ function setUnsave() {
   saveStatus.style = "color: red"
 }
 
-function renderButtons() {
-  // Editor DOM node
-  var editorplaceholder = document.getElementById("editor");
-  
-  var divButton = document.createElement("div");
-  document.body.insertBefore(divButton, editorplaceholder);
+function renderUI() {
+  var divButton = document.getElementById("taskfiles");
   
   for (var filename of FILENAMES) {
     var loadButton = document.createElement("button");
@@ -113,6 +109,10 @@ function renderButtons() {
     divButton.appendChild(loadButton);
     BUTTON_REFS[filename] = loadButton
   }
+
+  var statusBar = document.getElementById("statusbar");
+  
+
   
   // var backupButton = document.createElement("button");
   // backupButton.innerHTML = "Backup";
@@ -132,6 +132,10 @@ function renderButtons() {
   // document.body.insertBefore(serverMessage, editorplaceholder);
 }
 
+function handleUpdate() {
+  
+}
+
 
 function configureMonacoEditor(editor) {
   editor.getModel().onDidChangeContent(sendFileUpdate);
@@ -140,6 +144,6 @@ function configureMonacoEditor(editor) {
 // Click on the 'tasks' button. This will load the file and
 // configure the buttons
 
-renderButtons();
+renderUI();
 configureMonacoEditor(editor);
 BUTTON_REFS["tasks"].click();

@@ -21,4 +21,5 @@ self.MonacoEnvironment = {
 window.editor = monaco.editor.create(document.getElementById('editor'), {
 	value: "Loading .. .",
   theme: "vs-dark",
+  fontSize: 32,
 });

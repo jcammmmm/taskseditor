@@ -11,33 +11,27 @@
     }
 
     body, html {
-      height: 100%;
       margin: 0;
+      padding: 0;
+      font-family: monospace  ;
     }
     
-    #editor {
-        margin: 0;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 95vh;
-        width: 100%;
-    }
-
     /* TABS ------------------------------------------------------------------------ */
     /**
     Taken from https://www.w3schools.com/howto/howto_js_full_page_tabs.asp
     */
     /* Style tab links */
+    #taskfiles {
+      display: flex;
+    }
+
     .tablink {
       background-color: #1e1e1e;
       color: white;
       border: none;
-      outline: none;
       cursor: pointer;
       padding: .5% .5% 1%;
-      font-size: 17px;
+      font-size: 32px;
       width: 25%;
     }
 
@@ -45,20 +39,50 @@
       background-color: #777;
     }
 
-    .tabcontent {
+
+
+    /* EDITOR-----------------------------------------------------------------------------*/
+    #editor {
+        display: flex;
+        margin: 0;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 90vh
+    }
+
+    /* StatusBar-----------------------------------------------------------------------------*/
+    #statusbar {
+      font-size: 32px;
+      background-color: #1e1e1e;
+      border-top: solid  gray;   
       color: white;
-      display: none;
-      padding: 100px 20px;
-      height: 100%;
+    }
+
+    
+    #gestures {
+      background-color: rgb(128,128, 128, .05);
+      position: absolute;
+      bottom: 0;
+      height: 40vh;
+      width: 100%;
     }
   </style>
 </head>
 <body>
+  <!-- NAV BAR: Task file links -->
+  <div id="taskfiles"></div>
+
   <!-- MONACO -->
   <div id="editor"></div>
   <script src="editor/monaco/dist/app.bundle.js"></script>  
 
   <!-- BUTTONS -->
   <script src="editor/client.js"></script>
+
+  <div id="gestures"></div>
+  <!-- STATUS BAR -->
+  <footer id="statusbar">saved</footer>
 </body>
 </html>
