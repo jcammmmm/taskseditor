@@ -5,6 +5,8 @@ import logging
 from json import loads as decode_json, JSONDecodeError
 
 
+logger = logging.getLogger(__name__)
+
 SYS_OUTPUT = sys.stdout
 LOG_LEVEL = logging.INFO
 if __name__ == '__main__':
@@ -14,7 +16,6 @@ else:
   os.environ["REQUEST_METHOD"] = "POST"
   logger.debug("Running in dev mode.")
 
-logger = logging.getLogger(__name__)
 logging.basicConfig(level=LOG_LEVEL)
 
 print("Content-type: text/html\n")
@@ -49,6 +50,8 @@ def get_updates_from_client():
     print(mssge) # respond to the user with this message
     raise jde
 
+  logger.debug(updates)
+
   return updates
 
 
@@ -80,27 +83,23 @@ def _get_insertion_points(update, oneline_string_content):
   ini = -1
   end = -1
   resolve_ini = True
-  resolve_end = True
-
-  """
-  i r c A B a b
-  1 1 1 1 3 - - 
-  2 2
-  """
+  both_resolved = False
 
   for c in oneline_string_content:
     logger.debug("------------------------------------------------")
     logger.debug(f"{i} {ini} {end}")
-    logger.debug(f"> {resolve_ini} {row_num} | {col_num} ")
+    logger.debug(f"> {resolve_ini} {row_num} | {col_num} | '{c}' ")
     logger.debug(f"s {resolve_ini} {start_row} | {start_col} ")
     logger.debug(f"e {resolve_ini} {end_row} | {end_col} ")
-    if resolve_ini and row_num == start_row and col_num == start_col:
+    if resolve_ini and (row_num == start_row) and (col_num == start_col):
       ini = i
       resolve_ini = False
       if start_row == end_row and start_col == end_col: # no selection
         end = ini
-    elif not resolve_ini and row_num == end_row and col_num == end_col:
+        both_resolved = True
+    elif not resolve_ini and (row_num == end_row) and (col_num == end_col):
       end = i
+      both_resolved = True
     
     if c == '\n':
       row_num += 1
@@ -108,6 +107,9 @@ def _get_insertion_points(update, oneline_string_content):
     else:
       col_num += 1
     i += 1
+
+    if both_resolved:
+      break
 
   if end_col == col_num: # end_col == max_col + 1
     logger.debug("Update location is after the last character.")
@@ -121,12 +123,12 @@ def _get_insertion_points(update, oneline_string_content):
     # we need to add the new line character introduced there
     update["text"] = '\n' + update.get('text') 
 
-  logger.debug(f"{ini} {end}")
+  logger.debug(f"i e: {ini} {end}")
 
   if end < 0 or ini < 0: 
     mssge = "The range provided in the update action does not match the current text!"
     raise Exception(mssge)
-  logger.debug(f"{start_row} {start_col} {end_row} {end_col}")
+  logger.debug(f"sr sc er ec: {start_row} {start_col} {end_row} {end_col}")
 
   return ini, end
 
@@ -140,7 +142,6 @@ def apply_one_update(update, curr_content):
   """
   ini, end = _get_insertion_points(update, curr_content)
   new_text = update.get('text')
-  print(new_text.encode("unicode_escape"))
 
   return curr_content[:ini] + new_text + curr_content[end:]
 
@@ -155,11 +156,13 @@ def apply_updates():
   content = read_file_as_oneline_string(task_filename)
   for update in get_updates_from_client():
     content = apply_one_update(update, content)
-    logger.debug(content)
+    logger.debug(f"content:\n{content}")
   write_file(content, task_filename)
+  print("saved.")
 
-try:
-  apply_updates()
-except Exception as e:
-  logger.error(e)
-  print(e)
+if __name__ == '__main__':
+  try:
+    apply_updates()
+  except Exception as e:
+    logger.error(e)
+    print(e)

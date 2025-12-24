@@ -35,6 +35,13 @@ Backend Scripts
 Just run the scripts as standalone Python scripts. 
 
 
+Run tests
+===============================================================
+
+0. cd `script`
+1. `export PYTHONPATH=.. && python test/save.py`
+
+
 Other Notes
 ===============================================================
 While looking for a way to find file differences, I find several approaches: 
