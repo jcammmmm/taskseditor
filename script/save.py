@@ -68,38 +68,35 @@ def _get_insertion_points(update, oneline_string_content):
   """
   The editor guarrantees that 
     start_line_num <= end_line_num
-    start_col <= end_col
-  even you have selected the text from top to bottom
+    col_ini <= col_end
+  even you have selected the text from top to bottom.
+
+  The 1d end is exclusive and the 2d end at column level is also exclusive.
   """
-  start_row = update.get('range').get('startLineNumber')
-  start_col = update.get('range').get('startColumn')
-  end_row = update.get('range').get('endLineNumber')
-  end_col = update.get('range').get('endColumn')
+  row_ini = update.get('range').get('startLineNumber')
+  col_ini = update.get('range').get('startColumn')
+  row_end = update.get('range').get('endLineNumber')
+  col_end = update.get('range').get('endColumn')
 
   # insert update
-  row_num = 1
-  col_num = 1
-  i = 0
-  ini = -1
-  end = -1
-  resolve_ini = True
-  both_resolved = False
+  row_num = 1 # pointer
+  col_num = 1 # pointer
+  i = 0       # pointer 
+  ini = -1    # output
+  end = -1    # output
 
   for c in oneline_string_content:
     logger.debug("------------------------------------------------")
     logger.debug(f"{i} {ini} {end}")
-    logger.debug(f"> {resolve_ini} {row_num} | {col_num} | '{c}' ")
-    logger.debug(f"s {resolve_ini} {start_row} | {start_col} ")
-    logger.debug(f"e {resolve_ini} {end_row} | {end_col} ")
-    if resolve_ini and (row_num == start_row) and (col_num == start_col):
+    logger.debug(f"> {ini > 0} {row_num} | {col_num} | '{c}' ")
+    logger.debug(f"s {ini > 0} {row_ini} | {col_ini} ")
+    logger.debug(f"e {ini > 0} {row_end} | {col_end} ")
+    if ini < 0 and (row_num == row_ini) and (col_num == col_ini):
       ini = i
-      resolve_ini = False
-      if start_row == end_row and start_col == end_col: # no selection
+      if row_ini == row_end and col_ini == col_end: # no selection
         end = ini
-        both_resolved = True
-    elif not resolve_ini and (row_num == end_row) and (col_num == end_col):
+    elif (not ini < 0) and (row_num == row_end) and (col_num == col_end):
       end = i
-      both_resolved = True
     
     if c == '\n':
       row_num += 1
@@ -108,27 +105,40 @@ def _get_insertion_points(update, oneline_string_content):
       col_num += 1
     i += 1
 
-    if both_resolved:
+    if ini > -1 and end > -1:
       break
 
-  if end_col == col_num: # end_col == max_col + 1
-    logger.debug("Update location is after the last character.")
-    if not resolve_ini:
+  # Ending scenarios
+  # ini > -1 | end > -1
+  # ---------|----------
+  # True     |  True      : Both ends where found in the loop
+  # True     |  False     : End is missing
+  # False    |  True      : Impossible, it is necessary to find 'ini' first before 'end'
+  # False    |  False     : Not found yet, check one plus last position.
+  if row_end == row_num + 1: 
+    logger.debug("Update location is a newline after the last character")
+    if ini > -1:
       end = i
     else:
       ini = end = i
-  elif end_row == row_num + 1:
-    logger.debug("Update location is a newline after the last character")
-    ini = end = i 
     # we need to add the new line character introduced there
-    update["text"] = '\n' + update.get('text') 
+    update["text"] = '\n' + update.get('text')
+  elif col_end == col_num: # col_end == max_col + 1
+    logger.debug("Update location is after the last character.")
+    if ini > -1:
+      end = i
+    else:
+      ini = end = i
+  
+  if ini < 0 or end < 0:
+    mssge = "The range provided in the update action does not match the current text!"
+    raise Exception(mssge)
+
 
   logger.debug(f"i e: {ini} {end}")
 
-  if end < 0 or ini < 0: 
-    mssge = "The range provided in the update action does not match the current text!"
-    raise Exception(mssge)
-  logger.debug(f"sr sc er ec: {start_row} {start_col} {end_row} {end_col}")
+  
+  logger.debug(f"sr sc er ec: {row_ini} {col_ini} {row_end} {col_end}")
 
   return ini, end
 
