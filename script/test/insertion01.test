@@ -1,0 +1,38 @@
+#input
+123456789
+123456789
+123456789
+#output
+123456789123456789
+123456789
+123456789
+#updates
+[
+	{
+		"range": {
+			"startLineNumber": 1,
+			"startColumn": 10,
+			"endLineNumber": 1,
+			"endColumn": 10
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 2,
+			"startColumn": 1,
+			"endLineNumber": 2,
+			"endColumn": 1
+		},
+		"text": "123456789"
+	},
+	{
+		"range": {
+			"startLineNumber": 1,
+			"startColumn": 10,
+			"endLineNumber": 2,
+			"endColumn": 1
+		},
+		"text": ""
+	}
+]

@@ -115,25 +115,50 @@ def _get_insertion_points(update, oneline_string_content):
   # True     |  False     : End is missing
   # False    |  True      : Impossible, it is necessary to find 'ini' first before 'end'
   # False    |  False     : Not found yet, check one plus last position.
-  if row_end == row_num + 1: 
-    logger.debug("Update location is a newline after the last character")
-    if ini > -1:
-      end = i
-    else:
+  row_beyond = row_end == row_num + 1
+  col_beyond = col_end == col_num
+  if ini > -1:
+    if end < 0:
+      if col_beyond or row_beyond:
+        end = i
+        if row_beyond:
+          logger.debug("Update location is a newline after the last character")
+          # we need to add the new line character introduced there
+          # if len(update.get('text')) > 0:
+          # update["text"] = '\n' + update.get('text') 
+        if col_beyond:
+          logger.debug("Update location is after the last character.")
+  else:
+    if col_beyond or row_beyond:
       ini = end = i
-    # we need to add the new line character introduced there
-    update["text"] = '\n' + update.get('text')
-  elif col_end == col_num: # col_end == max_col + 1
-    logger.debug("Update location is after the last character.")
-    if ini > -1:
-      end = i
-    else:
-      ini = end = i
-  
-  if ini < 0 or end < 0:
-    mssge = "The range provided in the update action does not match the current text!"
-    raise Exception(mssge)
+      if row_beyond:
+        logger.debug("Update location is a newline after the last character")
+        # we need to add the new line character introduced there
+        # if len(update.get('text')) > 0:
+        # update["text"] = '\n' + update.get('text') 
+      if col_beyond:
+        logger.debug("Update location is after the last character.")
 
+    else:
+      mssge = "The range provided in the update action does not match the current text!"
+      raise Exception(mssge)
+
+  
+  # if row_end == row_num + 1: 
+  #   if ini > -1:
+  #     end = i
+  #   else:
+  #     ini = end = i
+  #   # we need to add the new line character introduced there
+  #   update["text"] = '\n' + update.get('text')
+  # elif col_end == col_num: # col_end == max_col + 1
+  #   if ini > -1:
+  #     end = i
+  #   else:
+  #     ini = end = i
+  
+  # # if ini < 0 or end < 0:
+    
 
   logger.debug(f"i e: {ini} {end}")
 
@@ -161,18 +186,21 @@ def write_file(content, task_filename):
   with open(f"../tasks/{task_filename}.tks", "w") as file:
     file.write(content)
 
-def apply_updates():
-  task_filename = os.getenv("QUERY_STRING", "???")
-  content = read_file_as_oneline_string(task_filename)
-  for update in get_updates_from_client():
-    content = apply_one_update(update, content)
+def apply_updates(content, updates):
+  for u in updates:
+    content = apply_one_update(u, content)
     logger.debug(f"content:\n{content}")
-  write_file(content, task_filename)
-  print("saved.")
-
+  return content
+  
 if __name__ == '__main__':
   try:
-    apply_updates()
+    task_filename = os.getenv("QUERY_STRING", "???")
+    content = read_file_as_oneline_string(task_filename)
+    updates = get_updates_from_client()
+    content = apply_updates(content, updates)
+    write_file(content, task_filename)
+    print("saved.")
+
   except Exception as e:
     logger.error(e)
     print(e)

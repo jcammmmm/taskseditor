@@ -1,0 +1,47 @@
+#input
+123456789
+123456789
+123456789
+#output
+123456789
+123456789
+12345
+#updates
+[
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 9,
+			"endLineNumber": 3,
+			"endColumn": 10
+		},
+		"text": ""
+	},
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 8,
+			"endLineNumber": 3,
+			"endColumn": 9
+		},
+		"text": ""
+	},
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 7,
+			"endLineNumber": 3,
+			"endColumn": 8
+		},
+		"text": ""
+	},
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 6,
+			"endLineNumber": 3,
+			"endColumn": 7
+		},
+		"text": ""
+	}
+]

@@ -1,0 +1,36 @@
+#input
+123456789
+123456789
+#output
+23456789
+23
+#updates
+[
+	{
+		"range": {
+			"startLineNumber": 2,
+			"startColumn": 1,
+			"endLineNumber": 2,
+			"endColumn": 2
+		},
+		"text": ""
+	},
+	{
+		"range": {
+			"startLineNumber": 1,
+			"startColumn": 1,
+			"endLineNumber": 1,
+			"endColumn": 2
+		},
+		"text": ""
+	},
+	{
+		"range": {
+			"startLineNumber": 2,
+			"startColumn": 3,
+			"endLineNumber": 3,
+			"endColumn": 1
+		},
+		"text": ""
+	}
+]

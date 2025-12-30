@@ -1,0 +1,144 @@
+#input
+Der Text ist unter der Lizenz „Creative-Commons Namensnennung – Weitergabe unter gleichen Bedingungen“ verfügbar; Informationen zu den Urhebern und zum Lizenzstatus eingebundener Mediendateien (etwa Bilder oder Videos) können im Regelfall durch Anklicken dieser abgerufen werden. Möglicherweise unterliegen die Inhalte jeweils zusätzlichen Bedingungen. Durch die Nutzung dieser Website erklären Sie sich mit den Nutzungsbedingungen und der Datenschutzrichtlinie einverstanden.
+
+#output
+Der Text ist unter der Lizenz „Creative-Commons 
+Namensnennung – Weitergabe unter gleichen Bedingungen“ 
+verfügbar; Informationen uz den Urhebern und uzm 
+Lizenzstatus eingebundener Mediendateien 
+(etwa Bilder oder Videos) können im Regelfall durch Anklicken 
+dieser abgerufen werden. Möglicherweise unterliegen
+ die Inhalte jeweils uzsätzlichen Bedingungen.
+  Durch die Nutuzng dieser Website erklären Sie
+   sich mit den Nutuzngsbedingungen und der
+    Datenschutzrichtlinie einverstanden.
+
+#updates
+[
+	{
+		"range": {
+			"startLineNumber": 1,
+			"startColumn": 49,
+			"endLineNumber": 1,
+			"endColumn": 49
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 2,
+			"startColumn": 56,
+			"endLineNumber": 2,
+			"endColumn": 56
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 50,
+			"endLineNumber": 3,
+			"endColumn": 50
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 4,
+			"startColumn": 42,
+			"endLineNumber": 4,
+			"endColumn": 42
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 5,
+			"startColumn": 63,
+			"endLineNumber": 5,
+			"endColumn": 63
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 6,
+			"startColumn": 52,
+			"endLineNumber": 6,
+			"endColumn": 52
+		},
+		"text": "\n"
+	},
+	{
+		"range": {
+			"startLineNumber": 7,
+			"startColumn": 47,
+			"endLineNumber": 7,
+			"endColumn": 47
+		},
+		"text": "\n "
+	},
+	{
+		"range": {
+			"startLineNumber": 8,
+			"startColumn": 48,
+			"endLineNumber": 8,
+			"endColumn": 48
+		},
+		"text": "\n  "
+	},
+	{
+		"range": {
+			"startLineNumber": 9,
+			"startColumn": 44,
+			"endLineNumber": 9,
+			"endColumn": 44
+		},
+		"text": "\n   "
+	},
+	{
+		"range": {
+			"startLineNumber": 9,
+			"startColumn": 20,
+			"endLineNumber": 9,
+			"endColumn": 22
+		},
+		"text": "uz"
+	},
+	{
+		"range": {
+			"startLineNumber": 8,
+			"startColumn": 16,
+			"endLineNumber": 8,
+			"endColumn": 18
+		},
+		"text": "uz"
+	},
+	{
+		"range": {
+			"startLineNumber": 7,
+			"startColumn": 22,
+			"endLineNumber": 7,
+			"endColumn": 24
+		},
+		"text": "uz"
+	},
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 46,
+			"endLineNumber": 3,
+			"endColumn": 48
+		},
+		"text": "uz"
+	},
+	{
+		"range": {
+			"startLineNumber": 3,
+			"startColumn": 26,
+			"endLineNumber": 3,
+			"endColumn": 28
+		},
+		"text": "uz"
+	}
+]

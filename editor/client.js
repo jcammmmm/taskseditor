@@ -2,6 +2,7 @@ const HOST = "localhost"
 const PROTO = "http"
 const FILENAMES = ["tasks", "plans", "food"];
 const BUTTON_REFS = {};
+var FILE_UPDATES = [];
 var CURRENT_FILE = "tasks";
 /**
  * This function is executed when the user clicks on the 'Load' button.
@@ -21,53 +22,14 @@ function load(filename) {
   });
 }
 
-/**
- * @deprecated in favor of new update logic. 
- */
-function save() {
+function sendFileUpdate() {
   var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
-  console.log(`saving file.. . "${url}"`);
-
-  var content = editor.getValue();
-  fetch(url, {
-    method: 'POST',
-    body: content
-  })
-  .then(response => response.text())
-  .then(data => {
-    console.log(data);
-  })
-}
-
-/**
- * 
- */
-let lastEdit = null;
-let i = 0;
-let firstLoad = true;
-
-function sendFileUpdate(event) {
-  if (firstLoad) {
-    firstLoad = false;
-    return;
-  }
   
-  var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
-  let changes = [];
-  // Several changes occur when you type '"' and automatically the
-  // editor adds the matching quote.
-  for (c of event.changes) {
-    // https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html#erased-structural-types
-    changes.push({
-      range: c.range,
-      text: c.text
-    })
-  }
-  
-  contentUpdates = JSON.stringify(changes, null, "\t");
+  contentUpdates = JSON.stringify(FILE_UPDATES, null, "\t");
+  FILE_UPDATES = [];
+
   console.log(contentUpdates);
   console.log(`sending content updates to: "${url}"`);
-
   fetch(url, {
     method: 'POST',
     body: contentUpdates
@@ -75,6 +37,9 @@ function sendFileUpdate(event) {
   .then(response => response.text())
   .then(data => {
     console.log(data);
+    
+    var statusBar = document.getElementById("statusbar");
+    statusBar.innerHTML = "saved."
   })
 }
 
@@ -82,11 +47,6 @@ function backup() {
   var url = `${PROTO}://${HOST}/script/backup.py`
   fetch(url);
   console.log(`backing up files.. . "${url}"`);
-}
-
-function setUnsave() {
-  saveStatus.innerHTML = "not saved.";
-  saveStatus.style = "color: red"
 }
 
 function renderUI() {
@@ -111,34 +71,35 @@ function renderUI() {
   }
 
   var statusBar = document.getElementById("statusbar");
-  
+  statusBar.innerHTML = "saved"
 
-  
-  // var backupButton = document.createElement("button");
-  // backupButton.innerHTML = "Backup";
-  // backupButton.onclick = function() { backup() };
-  // divButton.appendChild(backupButton);
-  
-  // var saveStatus = document.createElement("pre");
-  // saveStatus.id = "saveStatus"
-  // saveStatus.innerHTML = "not saved";
-  // saveStatus.style = "color: red"
-  // document.body.insertBefore(saveStatus, editorplaceholder);
-
-  // var serverMessage = document.createElement("pre");
-  // serverMessage.id = "serverMessage"
-  // serverMessage.innerHTML = "not saved";
-  // serverMessage.style = "color: red"
-  // document.body.insertBefore(serverMessage, editorplaceholder);
+  var saveButton = document.getElementById("savebutton");
+  saveButton.onclick = sendFileUpdate;
 }
 
-function handleUpdate() {
-  
+var firstLoad = true;
+function accummulateChanges(event) {
+  if (firstLoad) {
+    firstLoad = false;
+    return;
+  }
+
+  var statusBar = document.getElementById("statusbar");
+  statusBar.innerHTML = "not saved"
+  // Several changes occur when you type '"' and automatically the
+  // editor adds the matching quote.
+  for (c of event.changes) {
+    // https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html#erased-structural-types
+    FILE_UPDATES.push({
+      range: c.range,
+      text: c.text
+    })
+  }
 }
 
 
 function configureMonacoEditor(editor) {
-  editor.getModel().onDidChangeContent(sendFileUpdate);
+  editor.getModel().onDidChangeContent(accummulateChanges);
 }
 
 // Click on the 'tasks' button. This will load the file and
