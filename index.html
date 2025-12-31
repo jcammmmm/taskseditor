@@ -68,21 +68,49 @@
       height: 40vh;
       width: 100%;
     }
+
+    @keyframes grow-shrink {
+      25%,
+      75% {
+        scale: 100%;
+      }
+
+      50% {
+        scale: 200%;
+        color: white;
+      }
+    }
+
+    #savebutton {
+      font-family: monospace;
+      background-color: gray;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      position: absolute;
+      bottom: 20%;
+      right: 7%;
+      animation-duration: 3s;
+      animation-name: grow-shrink
+    }
+
   </style>
 </head>
 <body>
-  <!-- NAV BAR: Task file links -->
   <div id="taskfiles"></div>
-
-  <!-- MONACO -->
   <div id="editor"></div>
+  <div id="gestures">
+    <button id="savebutton">Save</button>
+  </div>
+  <footer id="statusbar"></footer>
+  
   <script src="editor/monaco/dist/app.bundle.js"></script>  
-
-  <!-- BUTTONS -->
   <script src="editor/client.js"></script>
-
-  <div id="gestures"></div>
-  <!-- STATUS BAR -->
-  <footer id="statusbar">saved</footer>
 </body>
 </html>

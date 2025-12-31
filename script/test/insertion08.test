@@ -1,0 +1,81 @@
+#input
+Pantry
+Musli
+Arroz
+Lenteja
+Maizpira
+
+
+Bodegón
+melon
+romanezca
+limones
+
+Nevera
+_pollo 260103
+_res   260102
+
+Congelador
+,Espinaca
+,Paleta
+_verdura congeladaLenteja
+Maizpira
+f
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#output
+Pantry
+Musli
+Arroz
+Lenteja
+Maizpira
+
+
+Bodegón
+melon
+romanezca
+limones
+
+Nevera
+_pollo 260103
+_res   260102
+
+Congelador
+,Espinaca
+,Paleta
+_verdura congeladaLenteja
+Maizpira
+#updates
+[
+	{
+		"range": {
+			"startLineNumber": 22,
+			"startColumn": 1,
+			"endLineNumber": 38,
+			"endColumn": 1
+		},
+		"text": ""
+	},
+	{
+		"range": {
+			"startLineNumber": 21,
+			"startColumn": 9,
+			"endLineNumber": 22,
+			"endColumn": 1
+		},
+		"text": ""
+	}
+]

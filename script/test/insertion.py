@@ -31,8 +31,8 @@ def test(testcase):
     print("TEST PASSED!")
   except AssertionError as ae:
     print("TEST FAILED!")
-    print(f"expected: \n{testcase['output']}")
-    print(f"current: \n{output}")
+    print(f"expected: \nvvvvvvvv\n{testcase['output']}\n^^^^^^^^")
+    print(f"current: \nvvvvvvvv\n{output}\n^^^^^^^^")
     raise ae
 
 
@@ -52,8 +52,7 @@ if __name__ == '__main__':
     ]
   """
 
-  filename_suffix = ['00', '01', '02', '03', '04', '05', '06', '07']
-  # filename_suffix = ['01'] #, '05', '06', '07']
+  filename_suffix = ['00', '01', '02', '03', '04', '05', '06', '07', '08']
 
   for fs in filename_suffix:
     print(f"Running test {fs} .. .")

@@ -100,6 +100,15 @@ case $1 in
   grant_permissions
 ;;
 
+"setup-server")
+  # TODO: NOT TESTED
+  # Configure Apache2 error logs. Echo two times to preserver the original example from 
+  # https://httpd.apache.org/docs/2.4/mod/core.html#errorlogformat
+  sudo echo ErrorLogFormat "[%t] [%l] [pid %P] %F: %E: [client %a] %M" >> /etc/apache2/apache2.conf
+  sudo echo ErrorLogFormat "[%t] [%l] [pid %P] [client %a] %M" >> /etc/apache2/apache2.conf
+  sudo echo ErrorLogFormat "[%t] [pid %P] %M" >> /etc/apache2/apache2.conf
+;;
+
 *)
   echo "Please select and option: 'generate' or 'deploy'"
   exit
