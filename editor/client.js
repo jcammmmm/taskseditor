@@ -4,6 +4,63 @@ const FILENAMES = ["tasks", "plans", "food"];
 const BUTTON_REFS = {};
 var FILE_UPDATES = [];
 var CURRENT_FILE = "tasks";
+
+
+class TasksModel {
+  constructor(filename, contents="") {
+    this.filename = filename;
+    this.editorModel = createEditorModel(contents, "text/plain");
+    this.fileUpdates = [];
+    
+    /**
+     * Because accumulateChanges will be called in a deferred manner by
+     * onDidChangeContent, the this binding to TaskModel will be undefined. 
+     * The two links below explain this behavior.
+     * 
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+     */
+    this.editorModel.onDidChangeContent(this.accummulateChanges.bind(this));
+  }
+
+  get model() {
+    return this.editorModel;
+  }
+
+  set model(contents) {
+    this.editorModel.setValue(contents);
+    // the previous call to 'setValue' is added to the undo stack, but 
+    // we do not need it, because we that is our starting edition point.
+    this.editorModel.popStackElement() 
+  }
+  
+  get updates() {
+    let u = this.fileUpdates;
+    this.fileUpdates = [];
+    return u;
+  }
+
+  accummulateChanges(event) {
+    var statusBar = document.getElementById("statusbar");
+    statusBar.innerHTML = "not saved.";
+    // Several changes occur when you type '"' and automatically the
+    // editor adds the matching quote. Or when you search and replace strings.
+    for (let c of event.changes) {
+      // https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html#erased-structural-types
+      this.fileUpdates.push({
+        range: c.range,
+        text: c.text
+      });
+    }
+  }
+}
+
+const FILE_MODELS = {
+  "tasks": new TasksModel("tasks"),
+  "plans": new TasksModel("plans"),
+  "food": new TasksModel("food"),
+}
+
 /**
  * This function is executed when the user clicks on the 'Load' button.
  * It Downloads the main.tks file from the server, reads its contents
@@ -17,19 +74,19 @@ function load(filename) {
   })
   .then(response => response.text())
   .then(data => {
-    editor.setValue(data);
+    FILE_MODELS[CURRENT_FILE].model = data;
+    editor.setModel(FILE_MODELS[CURRENT_FILE].model);
     console.log("loaded.");
   });
 }
 
-function sendFileUpdate() {
+function save() {
   var url = `${PROTO}://${HOST}/script/save.py?${CURRENT_FILE}`
-  
-  contentUpdates = JSON.stringify(FILE_UPDATES, null, "\t");
-  FILE_UPDATES = [];
 
+  contentUpdates = JSON.stringify(FILE_MODELS[CURRENT_FILE].updates, null, "\t");
+
+  console.log(`saving file updates to: "${url}"`);
   console.log(contentUpdates);
-  console.log(`sending content updates to: "${url}"`);
   fetch(url, {
     method: 'POST',
     body: contentUpdates
@@ -43,16 +100,10 @@ function sendFileUpdate() {
   })
 }
 
-function backup() {
-  var url = `${PROTO}://${HOST}/script/backup.py`
-  fetch(url);
-  console.log(`backing up files.. . "${url}"`);
-}
-
 function renderUI() {
   var divButton = document.getElementById("taskfiles");
   
-  for (var filename of FILENAMES) {
+  for (var filename in FILE_MODELS) {
     var loadButton = document.createElement("button");
     loadButton.className = "tablink"
     loadButton.innerHTML = filename;
@@ -74,37 +125,14 @@ function renderUI() {
   statusBar.innerHTML = "saved"
 
   var saveButton = document.getElementById("savebutton");
-  saveButton.onclick = sendFileUpdate;
-}
-
-var firstLoad = true;
-function accummulateChanges(event) {
-  if (firstLoad) {
-    firstLoad = false;
-    return;
-  }
-
-  var statusBar = document.getElementById("statusbar");
-  statusBar.innerHTML = "not saved"
-  // Several changes occur when you type '"' and automatically the
-  // editor adds the matching quote.
-  for (c of event.changes) {
-    // https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html#erased-structural-types
-    FILE_UPDATES.push({
-      range: c.range,
-      text: c.text
-    })
-  }
+  saveButton.onclick = save;
 }
 
 
-function configureMonacoEditor(editor) {
-  editor.getModel().onDidChangeContent(accummulateChanges);
-}
 
-// Click on the 'tasks' button. This will load the file and
-// configure the buttons
+
 
 renderUI();
-configureMonacoEditor(editor);
+// Click on the 'tasks' button. This will load the file and
+// configure the buttons
 BUTTON_REFS["tasks"].click();

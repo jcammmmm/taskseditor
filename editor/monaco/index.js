@@ -23,3 +23,5 @@ window.editor = monaco.editor.create(document.getElementById('editor'), {
   theme: "vs-dark",
   fontSize: 32,
 });
+
+window.createEditorModel = monaco.editor.createModel
