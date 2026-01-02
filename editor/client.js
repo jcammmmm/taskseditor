@@ -7,20 +7,20 @@ var CURRENT_FILE = "tasks";
 
 
 class TasksModel {
-  constructor(filename, contents="") {
+  constructor(filename) {
     this.filename = filename;
-    this.editorModel = createEditorModel(contents, "text/plain");
+    this.editorModel = createEditorModel("", "text/plain");
     this.fileUpdates = [];
     
     /**
-     * Because accumulateChanges will be called in a deferred manner by
+     * Because accumulateChanges will be called in a deferred way by
      * onDidChangeContent, the this binding to TaskModel will be undefined. 
      * The two links below explain this behavior.
      * 
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-     */
-    this.editorModel.onDidChangeContent(this.accummulateChanges.bind(this));
+    */
+   this.editorModel.onDidChangeContent(this.accummulateChanges.bind(this));
   }
 
   get model() {
@@ -40,7 +40,17 @@ class TasksModel {
     return u;
   }
 
+  hasUpdates() {
+    return this.fileUpdates.length != 0;
+  }
+
   accummulateChanges(event) {
+    // Only event changes different from setting contents directly to the model
+    // are considered as changes made to the task file.
+    if (event.detailedReasons[0].metadata.source == "setValue") {
+      return;
+    }
+    
     var statusBar = document.getElementById("statusbar");
     statusBar.innerHTML = "not saved.";
     // Several changes occur when you type '"' and automatically the
@@ -74,8 +84,8 @@ function load(filename) {
   })
   .then(response => response.text())
   .then(data => {
-    FILE_MODELS[CURRENT_FILE].model = data;
-    editor.setModel(FILE_MODELS[CURRENT_FILE].model);
+    FILE_MODELS[filename].model = data;
+    editor.setModel(FILE_MODELS[filename].model);
     console.log("loaded.");
   });
 }
@@ -107,7 +117,12 @@ function renderUI() {
     var loadButton = document.createElement("button");
     loadButton.className = "tablink"
     loadButton.innerHTML = filename;
-    loadButton.onclick = function (e) { 
+    loadButton.onclick = function (e) {
+      if (FILE_MODELS[CURRENT_FILE].hasUpdates()) {
+        alert("current file has pending updates to be saved.");
+        return;
+      }
+
       load(e.target.innerHTML);
       CURRENT_FILE = e.target.innerHTML;
       for (let btn in BUTTON_REFS) {
@@ -127,10 +142,6 @@ function renderUI() {
   var saveButton = document.getElementById("savebutton");
   saveButton.onclick = save;
 }
-
-
-
-
 
 renderUI();
 // Click on the 'tasks' button. This will load the file and
